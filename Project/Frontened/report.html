@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Issue | FixMyCity</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">Fix<span>MyCity</span></div>
+
+
+<div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="report.html">Report Issue</a>
+    <a href="complaints.html">My Complaints</a>
+    <a href="login.html" class="login-btn">Login</a>
+</div>
+
+
+</nav>
+
+<div class="page-container">
+
+
+<div class="page-heading">
+    <span class="badge">📍 Civic Complaint</span>
+    <h1>Report an Issue</h1>
+    <p>Tell us about the problem in your area.</p>
+</div>
+
+<div class="form-card">
+
+    <form onsubmit="analyzeComplaint(event)">
+
+        <label>Issue Title</label>
+        <input type="text" id="issueTitle"
+               placeholder="Example: Large pothole on main road" required>
+
+        <label>Category</label>
+        <select id="category">
+            <option value="">Select category</option>
+            <option>Road & Pothole</option>
+            <option>Garbage & Waste</option>
+            <option>Street Light</option>
+            <option>Water Supply</option>
+            <option>Drainage</option>
+            <option>Public Safety</option>
+            <option>Other</option>
+        </select>
+
+        <label>Description</label>
+        <textarea id="description"
+                  placeholder="Describe the issue in detail..."
+                  required></textarea>
+
+        <label>Upload Image</label>
+        <div class="upload-box">
+            <input type="file" id="issueImage" accept="image/*">
+            <p>📷 Upload a photo of the issue</p>
+        </div>
+
+        <label>Location</label>
+        <div class="location-row">
+            <input type="text" id="location"
+                   placeholder="Enter location" required>
+
+            <button type="button" class="location-btn"
+                    onclick="getLocation()">
+                📍 Get Location
+            </button>
+        </div>
+
+        <button class="primary-btn full-btn" type="submit">
+            🤖 Analyze Complaint with AI
+        </button>
+
+    </form>
+</div>
+
+
+</div>
+
+<script src="js/script.js"></script>
+
+</body>
+</html>
