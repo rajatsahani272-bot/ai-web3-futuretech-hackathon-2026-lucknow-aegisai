@@ -25,6 +25,24 @@ const getComplaintById = async (complaintId) => {
 
   return complaint;
 };
+const updateComplaintByAdmin = async (complaintId, updateData) => {
+  const complaint = await Complaint.findByIdAndUpdate(
+    complaintId,
+    updateData,
+    {
+      new: true,
+      runValidators: true,
+    }
+  )
+    .populate("user", "name email")
+    .populate("department", "name");
+
+  if (!complaint) {
+    throw new Error("Complaint not found");
+  }
+
+  return complaint;
+};
 
 const updateComplaint = async (complaintId, userId, updateData) => {
   const complaint = await Complaint.findOneAndUpdate(
@@ -59,10 +77,21 @@ const deleteComplaint = async (complaintId, userId) => {
   return complaint;
 };
 
+const getAllComplaints = async () => {
+  const complaints = await Complaint.find()
+    .populate("user", "name email")
+    .populate("department", "name")
+    .sort({ createdAt: -1 });
+
+  return complaints;
+};
+
 export {
   createComplaint,
   getUserComplaints,
   getComplaintById,
   updateComplaint,
+  updateComplaintByAdmin,
   deleteComplaint,
+  getAllComplaints,
 };

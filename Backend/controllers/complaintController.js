@@ -4,6 +4,8 @@ import {
   getComplaintById,
   updateComplaint,
   deleteComplaint,
+  getAllComplaints,
+  updateComplaintByAdmin,
 } from "../services/complaintService.js";
 
 export const create = async (req, res, next) => {
@@ -53,9 +55,8 @@ export const getById = async (req, res, next) => {
 
 export const update = async (req, res, next) => {
   try {
-    const complaint = await updateComplaint(
+    const complaint = await updateComplaintByAdmin(
       req.params.id,
-      req.user.id,
       req.body
     );
 
@@ -79,6 +80,19 @@ export const remove = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Complaint deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAll = async (req, res, next) => {
+  try {
+    const complaints = await getAllComplaints();
+
+    res.status(200).json({
+      success: true,
+      data: complaints,
     });
   } catch (error) {
     next(error);

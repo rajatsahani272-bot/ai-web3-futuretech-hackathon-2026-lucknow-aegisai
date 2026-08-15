@@ -5,9 +5,11 @@ import {
   getById,
   update,
   remove,
+  getAll,
 } from "../controllers/complaintController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
+import adminMiddleware from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
 
@@ -18,7 +20,12 @@ router.get(
   authMiddleware,
   getMyComplaints
 );
-
+router.get(
+  "/",
+  authMiddleware,
+  adminMiddleware,
+  getAll
+);
 router.get(
   "/:id",
   authMiddleware,
@@ -28,6 +35,7 @@ router.get(
 router.patch(
   "/:id",
   authMiddleware,
+  adminMiddleware,
   update
 );
 
@@ -36,5 +44,6 @@ router.delete(
   authMiddleware,
   remove
 );
+
 
 export default router;
