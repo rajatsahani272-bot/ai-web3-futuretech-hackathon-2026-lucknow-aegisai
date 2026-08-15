@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Analysis | FixMyCity</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">Fix<span>MyCity</span></div>
+
+```
+<div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="report.html">Report Issue</a>
+    <a href="complaints.html">My Complaints</a>
+</div>
+```
+
+</nav>
+
+<div class="page-container">
+
+```
+<div class="page-heading">
+    <span class="badge">🤖 AI Analysis</span>
+    <h1>Complaint Analysis Result</h1>
+    <p>Our AI has analyzed your complaint.</p>
+</div>
+
+<div class="analysis-grid">
+
+    <div class="analysis-card">
+        <div class="result-icon">🕳️</div>
+        <h2 id="resultTitle">Road Pothole</h2>
+        <p id="resultDescription">
+            AI detected a road-related civic issue.
+        </p>
+
+        <div class="confidence">
+            <span>AI Confidence</span>
+            <strong>94%</strong>
+        </div>
+
+        <div class="progress">
+            <div></div>
+        </div>
+    </div>
+
+    <div class="analysis-card">
+        <h3>📌 Issue Category</h3>
+        <div class="result-value" id="resultCategory">
+            Road & Pothole
+        </div>
+
+        <h3>⚠️ Severity</h3>
+        <div class="severity high">HIGH</div>
+
+        <h3>🏢 Suggested Department</h3>
+        <div class="result-value">
+            Municipal Road Department
+        </div>
+    </div>
+
+</div>
+
+<div class="action-card">
+    <h2>Complaint Ready to Submit</h2>
+    <p>
+        AI has classified your complaint and identified the
+        appropriate department.
+    </p>
+
+    <button class="primary-btn" onclick="submitComplaint()">
+        ✅ Submit Complaint
+    </button>
+
+    <a href="report.html" class="secondary-btn">
+        Edit Complaint
+    </a>
+</div>
+```
+
+</div>
+
+<script src="js/script.js"></script>
+
+</body>
+</html>
