@@ -1,134 +1,349 @@
 <!DOCTYPE html>
-
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Complaint Details | FixMyCity</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
 <nav class="navbar">
-    <div class="logo">Fix<span>MyCity</span></div>
 
+    <div class="logo">
+        Fix<span>MyCity</span>
+    </div>
 
-<div class="nav-links">
-    <a href="index.html">Home</a>
-    <a href="report.html">Report Issue</a>
-    <a href="complaints.html">My Complaints</a>
-</div>
-
+    <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="report.html">Report Issue</a>
+        <a href="complaints.html">My Complaints</a>
+    </div>
 
 </nav>
 
 <div class="page-container">
 
+    <div
+        class="details-header"
+        id="detailsHeader"
+    >
+        <div>
+            <span
+                class="complaint-id"
+                id="complaintId"
+            >
+                Loading...
+            </span>
 
-<div class="details-header">
-    <div>
-        <span class="complaint-id">Complaint #FMC10245</span>
-        <h1>Large Pothole on Main Road</h1>
-        <p>📍 Lucknow, Uttar Pradesh</p>
+            <h1 id="complaintTitle">
+                Loading...
+            </h1>
+
+            <p id="complaintLocation">
+                📍 Loading...
+            </p>
+        </div>
+
+        <div
+            class="status pending"
+            id="complaintStatus"
+        >
+            Loading...
+        </div>
     </div>
 
-    <div class="status in-progress">
-        In Progress
+    <div class="details-grid">
+
+        <div class="details-card">
+
+            <h2>Complaint Information</h2>
+
+            <div class="detail-row">
+                <span>Category</span>
+                <strong id="complaintCategory">
+                    Loading...
+                </strong>
+            </div>
+
+            <div class="detail-row">
+                <span>Severity</span>
+                <strong
+                    class="danger-text"
+                    id="complaintSeverity"
+                >
+                    High
+                </strong>
+            </div>
+
+            <div class="detail-row">
+                <span>Department</span>
+                <strong id="complaintDepartment">
+                    Loading...
+                </strong>
+            </div>
+
+            <div class="detail-row">
+                <span>Submitted</span>
+                <strong id="complaintDate">
+                    Loading...
+                </strong>
+            </div>
+
+            <div class="detail-row">
+                <span>Description</span>
+                <strong id="complaintDescription">
+                    Loading...
+                </strong>
+            </div>
+
+        </div>
+
+        <div class="details-card">
+
+            <h2>🤖 AI Analysis</h2>
+
+            <p id="aiDescription">
+                AI analysis information will appear here.
+            </p>
+
+            <div class="ai-result">
+                <span>AI Confidence</span>
+                <strong id="aiConfidence">
+                    94%
+                </strong>
+            </div>
+
+        </div>
+
     </div>
+
+    <div class="details-card timeline-card">
+
+        <h2>📊 Complaint Timeline</h2>
+
+        <div
+            class="timeline"
+            id="complaintTimeline"
+        >
+            <p>Loading timeline...</p>
+        </div>
+
+    </div>
+
 </div>
 
-<div class="details-grid">
+<script src="js/script.js"></script>
 
-    <div class="details-card">
-        <h2>Complaint Information</h2>
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
 
-        <div class="detail-row">
-            <span>Category</span>
-            <strong>Road & Pothole</strong>
-        </div>
+    const params = new URLSearchParams(
+        window.location.search
+    );
 
-        <div class="detail-row">
-            <span>Severity</span>
-            <strong class="danger-text">High</strong>
-        </div>
+    const complaintId = params.get("id");
 
-        <div class="detail-row">
-            <span>Department</span>
-            <strong>Municipal Road Department</strong>
-        </div>
+    if (!complaintId) {
+        alert("Complaint ID not found.");
+        window.location.href = "complaints.html";
+        return;
+    }
 
-        <div class="detail-row">
-            <span>Submitted</span>
-            <strong>10 August 2026</strong>
-        </div>
-    </div>
+    const complaint =
+        await getComplaintById(complaintId);
 
-    <div class="details-card">
-        <h2>🤖 AI Analysis</h2>
+    if (!complaint) {
+        alert("Unable to load complaint.");
+        window.location.href = "complaints.html";
+        return;
+    }
 
-        <p>
-            AI identified this complaint as a major road pothole
-            that may create a safety risk for commuters.
-        </p>
+    document.getElementById("complaintId").innerText =
+        `Complaint #${complaint._id}`;
 
-        <div class="ai-result">
-            <span>AI Confidence</span>
-            <strong>94%</strong>
-        </div>
-    </div>
+    document.getElementById("complaintTitle").innerText =
+        complaint.title || "Untitled Complaint";
 
-</div>
+    const latitude =
+        complaint.location?.latitude;
 
-<div class="details-card timeline-card">
-    <h2>📊 Complaint Timeline</h2>
+    const longitude =
+        complaint.location?.longitude;
 
-    <div class="timeline">
+    if (latitude && longitude) {
+        document.getElementById(
+            "complaintLocation"
+        ).innerText =
+            `📍 ${latitude}, ${longitude}`;
+    } else {
+        document.getElementById(
+            "complaintLocation"
+        ).innerText =
+            "📍 Location unavailable";
+    }
 
+    const status =
+        complaint.status || "Pending";
+
+    const statusElement =
+        document.getElementById("complaintStatus");
+
+    statusElement.innerText = status;
+    statusElement.className =
+        `status ${status.toLowerCase().replace(/\s+/g, "-")}`;
+
+    document.getElementById(
+        "complaintCategory"
+    ).innerText =
+        complaint.category || "Other";
+
+    document.getElementById(
+        "complaintDescription"
+    ).innerText =
+        complaint.description || "No description";
+
+    document.getElementById(
+        "complaintDepartment"
+    ).innerText =
+        complaint.assignedDepartment?.name ||
+        "Not assigned";
+
+    document.getElementById(
+        "complaintDate"
+    ).innerText =
+        complaint.createdAt
+            ? new Date(
+                complaint.createdAt
+            ).toLocaleDateString(
+                "en-IN",
+                {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric"
+                }
+            )
+            : "Date unavailable";
+
+    document.getElementById(
+        "aiDescription"
+    ).innerText =
+        `AI identified this complaint as a ${complaint.category || "civic"} issue.`;
+
+    renderComplaintTimeline(complaint);
+});
+
+function renderComplaintTimeline(complaint) {
+
+    const timeline =
+        document.getElementById(
+            "complaintTimeline"
+        );
+
+    const status =
+        (complaint.status || "Pending")
+        .toLowerCase();
+
+    const submittedDate =
+        complaint.createdAt
+            ? new Date(
+                complaint.createdAt
+            ).toLocaleString(
+                "en-IN",
+                {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit"
+                }
+            )
+            : "Date unavailable";
+
+    let assignedClass = "";
+    let progressClass = "";
+    let resolvedClass = "";
+
+    if (
+        status === "assigned" ||
+        status === "in progress" ||
+        status === "resolved"
+    ) {
+        assignedClass = "completed";
+    }
+
+    if (
+        status === "in progress" ||
+        status === "resolved"
+    ) {
+        progressClass = "completed";
+    }
+
+    if (status === "resolved") {
+        resolvedClass = "completed";
+    }
+
+    timeline.innerHTML = `
         <div class="timeline-item completed">
             <div class="timeline-dot">✓</div>
             <div>
                 <h3>Complaint Submitted</h3>
-                <p>10 Aug 2026 • 10:25 AM</p>
+                <p>${submittedDate}</p>
             </div>
         </div>
 
-        <div class="timeline-item completed">
-            <div class="timeline-dot">✓</div>
-            <div>
-                <h3>AI Verified</h3>
-                <p>10 Aug 2026 • 10:26 AM</p>
+        <div class="timeline-item ${assignedClass}">
+            <div class="timeline-dot">
+                ${assignedClass ? "✓" : "○"}
             </div>
-        </div>
-
-        <div class="timeline-item completed">
-            <div class="timeline-dot">✓</div>
             <div>
                 <h3>Assigned to Department</h3>
-                <p>10 Aug 2026 • 11:10 AM</p>
+                <p>
+                    ${
+                        complaint.assignedDepartment?.name ||
+                        "Waiting for assignment"
+                    }
+                </p>
             </div>
         </div>
 
-        <div class="timeline-item active">
-            <div class="timeline-dot">●</div>
+        <div class="timeline-item ${progressClass}">
+            <div class="timeline-dot">
+                ${progressClass ? "✓" : "○"}
+            </div>
             <div>
                 <h3>Work in Progress</h3>
-                <p>11 Aug 2026</p>
+                <p>
+                    ${
+                        status === "in progress" ||
+                        status === "resolved"
+                            ? "Complaint is being worked on"
+                            : "Waiting for department"
+                    }
+                </p>
             </div>
         </div>
 
-        <div class="timeline-item">
-            <div class="timeline-dot">○</div>
+        <div class="timeline-item ${resolvedClass}">
+            <div class="timeline-dot">
+                ${resolvedClass ? "✓" : "○"}
+            </div>
             <div>
                 <h3>Resolved</h3>
-                <p>Waiting for completion</p>
+                <p>
+                    ${
+                        status === "resolved"
+                            ? "Complaint resolved"
+                            : "Waiting for completion"
+                    }
+                </p>
             </div>
         </div>
-
-    </div>
-</div>
-
-
-</div>
+    `;
+}
+</script>
 
 </body>
 </html>

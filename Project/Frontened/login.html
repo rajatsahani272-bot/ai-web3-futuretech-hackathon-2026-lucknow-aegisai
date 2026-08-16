@@ -1,53 +1,121 @@
 <!DOCTYPE html>
-
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Login | FixMyCity</title>
+
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body class="auth-body">
 
 <div class="auth-container">
 
+    <div class="auth-brand">
 
-<div class="auth-brand">
-    <div class="logo">Fix<span>MyCity</span></div>
-    <h1>Make Your City Better</h1>
-    <p>Report civic problems and track their resolution.</p>
-</div>
-
-<div class="auth-box">
-    <h2 id="authTitle">Welcome Back 👋</h2>
-    <p id="authSubtitle">Login to manage your complaints</p>
-
-    <form onsubmit="loginUser(event)">
-
-        <div id="nameField" class="hidden">
-            <label>Full Name</label>
-            <input type="text" id="name" placeholder="Enter your name">
+        <div class="logo">
+            Fix<span>MyCity</span>
         </div>
 
-        <label>Email</label>
-        <input type="email" id="email" placeholder="Enter email" required>
+        <h1>Make Your City Better</h1>
 
-        <label>Password</label>
-        <input type="password" id="password" placeholder="Enter password" required>
+        <p>
+            Report civic problems and track their resolution.
+        </p>
 
-        <button class="primary-btn full-btn" type="submit">
-            Login
-        </button>
-    </form>
+    </div>
 
-    <p class="switch-auth">
-        <span id="switchText">Don't have an account?</span>
-        <button onclick="toggleAuth()" id="switchBtn">Sign Up</button>
-    </p>
+
+    <div class="auth-box">
+
+        <h2 id="authTitle">
+            Welcome Back 👋
+        </h2>
+
+        <p id="authSubtitle">
+            Login to manage your complaints
+        </p>
+
+
+        <form onsubmit="loginUser(event)">
+
+            <!-- NAME -->
+
+            <div id="nameField" class="hidden">
+
+                <label>Full Name</label>
+
+                <input
+                    type="text"
+                    id="name"
+                    placeholder="Enter your name"
+                >
+
+            </div>
+
+
+            <!-- EMAIL -->
+
+            <label>Email</label>
+
+            <input
+                type="email"
+                id="email"
+                placeholder="Enter email"
+                required
+            >
+
+
+            <!-- PASSWORD -->
+
+            <label>Password</label>
+
+            <input
+                type="password"
+                id="password"
+                placeholder="Enter password"
+                required
+            >
+
+
+            <!-- SUBMIT -->
+
+            <button
+                class="primary-btn full-btn"
+                type="submit"
+                id="authSubmitBtn"
+            >
+                Login
+            </button>
+
+        </form>
+
+
+        <!-- SWITCH LOGIN / SIGNUP -->
+
+        <p class="switch-auth">
+
+            <span id="switchText">
+                Don't have an account?
+            </span>
+
+            <button
+                type="button"
+                onclick="toggleAuth()"
+                id="switchBtn"
+            >
+                Sign Up
+            </button>
+
+        </p>
+
+    </div>
+
 </div>
 
-
-</div>
 
 <script src="js/script.js"></script>
 
