@@ -1,95 +1,143 @@
 <!DOCTYPE html>
-
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Complaints | FixMyCity</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
 <nav class="navbar">
-    <div class="logo">Fix<span>MyCity</span></div>
 
+    <div class="logo">
+        Fix<span>MyCity</span>
+    </div>
 
-<div class="nav-links">
-    <a href="index.html">Home</a>
-    <a href="report.html">Report Issue</a>
-    <a href="complaints.html">My Complaints</a>
-</div>
-
+    <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="report.html">Report Issue</a>
+        <a href="complaints.html">My Complaints</a>
+    </div>
 
 </nav>
 
 <div class="page-container">
 
-
-<div class="page-heading">
-    <span class="badge">📋 Dashboard</span>
-    <h1>My Complaints</h1>
-    <p>Track all your reported civic issues.</p>
-</div>
-
-<div class="complaint-list">
-
-    <div class="complaint-card">
-        <div class="complaint-info">
-            <span class="complaint-id">#FMC10245</span>
-            <h2>Large Pothole on Main Road</h2>
-            <p>📍 Lucknow, Uttar Pradesh</p>
-            <p>📅 10 August 2026</p>
-        </div>
-
-        <div class="status in-progress">
-            In Progress
-        </div>
-
-        <a href="details.html" class="track-btn">
-            Track →
-        </a>
+    <div class="page-heading">
+        <span class="badge">📋 Dashboard</span>
+        <h1>My Complaints</h1>
+        <p>Track all your reported civic issues.</p>
     </div>
 
-    <div class="complaint-card">
-        <div class="complaint-info">
-            <span class="complaint-id">#FMC10231</span>
-            <h2>Street Light Not Working</h2>
-            <p>📍 Lucknow, Uttar Pradesh</p>
-            <p>📅 7 August 2026</p>
-        </div>
-
-        <div class="status resolved">
-            Resolved
-        </div>
-
-        <a href="details.html" class="track-btn">
-            Track →
-        </a>
+    <div
+        class="complaint-list"
+        id="complaintList"
+    >
+        <p>Loading complaints...</p>
     </div>
-
-    <div class="complaint-card">
-        <div class="complaint-info">
-            <span class="complaint-id">#FMC10198</span>
-            <h2>Garbage Collection Issue</h2>
-            <p>📍 Lucknow, Uttar Pradesh</p>
-            <p>📅 2 August 2026</p>
-        </div>
-
-        <div class="status pending">
-            Pending
-        </div>
-
-        <a href="details.html" class="track-btn">
-            Track →
-        </a>
-    </div>
-
-</div>
-
 
 </div>
 
 <script src="js/script.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+
+    const complaintList =
+        document.getElementById("complaintList");
+
+    const complaints = await getMyComplaints();
+
+    if (!complaints || complaints.length === 0) {
+        complaintList.innerHTML = `
+            <div class="complaint-card">
+                <div class="complaint-info">
+                    <h2>No Complaints Found</h2>
+                    <p>You have not submitted any complaints yet.</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    complaintList.innerHTML = complaints.map(function (complaint) {
+
+        const date = complaint.createdAt
+            ? new Date(complaint.createdAt).toLocaleDateString(
+                "en-IN",
+                {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric"
+                }
+            )
+            : "Date unavailable";
+
+        const status =
+            complaint.status || "Pending";
+
+        const statusClass =
+            status.toLowerCase().replace(/\s+/g, "-");
+
+        const latitude =
+            complaint.location?.latitude;
+
+        const longitude =
+            complaint.location?.longitude;
+
+        const location =
+            latitude && longitude
+                ? `${latitude}, ${longitude}`
+                : "Location unavailable";
+
+        return `
+            <div class="complaint-card">
+
+                <div class="complaint-info">
+
+                    <span class="complaint-id">
+                        #${complaint._id}
+                    </span>
+
+                    <h2>
+                        ${complaint.title || "Untitled Complaint"}
+                    </h2>
+
+                    <p>
+                        📂 ${complaint.category || "Other"}
+                    </p>
+
+                    <p>
+                        📍 ${location}
+                    </p>
+
+                    <p>
+                        📅 ${date}
+                    </p>
+
+                </div>
+
+                <div class="status ${statusClass}">
+                    ${status}
+                </div>
+
+                <a
+                    href="details.html?id=${complaint._id}"
+                    class="track-btn"
+                >
+                    Track →
+                </a>
+
+            </div>
+        `;
+
+    }).join("");
+
+});
+</script>
 
 </body>
 </html>
