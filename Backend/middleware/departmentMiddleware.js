@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-const adminMiddleware = (
+const departmentMiddleware = (
   req,
   res,
   next
@@ -22,11 +22,11 @@ const adminMiddleware = (
       process.env.ACCESS_TOKEN_SECRET
     );
 
-    if (decoded.role !== "admin") {
+    if (decoded.role !== "department") {
       return res.status(403).json({
         success: false,
         message:
-          "Admin access required",
+          "Department access required",
       });
     }
 
@@ -36,7 +36,7 @@ const adminMiddleware = (
 
   } catch (error) {
     console.error(
-      "Admin middleware error:",
+      "Department middleware error:",
       error.message
     );
 
@@ -48,4 +48,4 @@ const adminMiddleware = (
   }
 };
 
-export default adminMiddleware;
+export default departmentMiddleware;

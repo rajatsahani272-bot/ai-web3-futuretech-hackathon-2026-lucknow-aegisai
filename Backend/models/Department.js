@@ -9,6 +9,27 @@ const departmentSchema = new mongoose.Schema(
       trim: true,
     },
 
+    departmentCode: {
+      type: String,
+      required: true,
+      unique: true,
+      uppercase: true,
+      trim: true,
+    },
+
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+
+    password: {
+      type: String,
+      required: true,
+    },
+
     description: {
       type: String,
       trim: true,
@@ -25,6 +46,9 @@ const departmentSchema = new mongoose.Schema(
   }
 );
 
-const Department = mongoose.model("Department", departmentSchema);
+const Department = mongoose.model(
+  "Department",
+  departmentSchema
+);
 
 export default Department;

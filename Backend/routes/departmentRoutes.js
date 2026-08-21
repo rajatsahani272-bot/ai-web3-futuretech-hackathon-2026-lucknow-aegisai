@@ -1,45 +1,39 @@
 import express from "express";
 
 import {
-  create,
-  getAll,
-  getById,
-  update,
-  remove,
+    signup,
+    getDepartments,
+    getDepartmentComplaints,
 } from "../controllers/departmentController.js";
 
-import authMiddleware from "../middleware/authMiddleware.js";
-import adminMiddleware from "../middleware/adminMiddleware.js";
+import departmentMiddleware from "../middleware/departmentMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", authMiddleware, getAll);
 
-router.get(
-  "/:id",
-  authMiddleware,
-  getById
-);
+// Department signup
 
 router.post(
-  "/",
-  authMiddleware,
-  adminMiddleware,
-  create
+    "/signup",
+    signup
 );
 
-router.patch(
-  "/:id",
-  authMiddleware,
-  adminMiddleware,
-  update
+
+// Get departments
+
+router.get(
+    "/",
+    departmentMiddleware,
+    getDepartments
 );
 
-router.delete(
-  "/:id",
-  authMiddleware,
-  adminMiddleware,
-  remove
+
+// Department complaints
+
+router.get(
+    "/complaints",
+    departmentMiddleware,
+    getDepartmentComplaints
 );
 
 export default router;

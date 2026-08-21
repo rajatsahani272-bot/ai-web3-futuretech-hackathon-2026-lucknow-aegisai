@@ -1,15 +1,32 @@
 import bcrypt from "bcryptjs";
+
 import User from "../models/User.js";
+import Department from "../models/Department.js";
+
 import generateAccessToken from "../utils/generateToken.js";
 
-const registerUser = async ({ name, email, password }) => {
-    const existingUser = await User.findOne({ email });
+
+// User register
+
+const registerUser = async ({
+    name,
+    email,
+    password,
+}) => {
+    const existingUser =
+        await User.findOne({ email });
 
     if (existingUser) {
-        throw new Error("User already exists");
+        throw new Error(
+            "User already exists"
+        );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword =
+        await bcrypt.hash(
+            password,
+            10
+        );
 
     const user = await User.create({
         name,
@@ -27,26 +44,40 @@ const registerUser = async ({ name, email, password }) => {
     };
 };
 
-const loginUser = async ({ email, password }) => {
-    const user = await User.findOne({ email });
+
+// User login
+
+const loginUser = async ({
+    email,
+    password,
+}) => {
+    const user =
+        await User.findOne({ email });
 
     if (!user) {
-        throw new Error("Invalid email or password");
+        throw new Error(
+            "Invalid email or password"
+        );
     }
 
-    const isPasswordValid = await bcrypt.compare(
-        password,
-        user.password
-    );
+    const isPasswordValid =
+        await bcrypt.compare(
+            password,
+            user.password
+        );
 
     if (!isPasswordValid) {
-        throw new Error("Invalid email or password");
+        throw new Error(
+            "Invalid email or password"
+        );
     }
 
-    const accessToken = generateAccessToken(user);
+    const accessToken =
+        generateAccessToken(user);
 
     return {
         accessToken,
+
         user: {
             id: user._id,
             name: user.name,
@@ -56,30 +87,47 @@ const loginUser = async ({ email, password }) => {
     };
 };
 
-const adminLoginUser = async ({ email, password }) => {
-    const user = await User.findOne({ email });
+
+// Admin login
+
+const adminLoginUser = async ({
+    email,
+    password,
+}) => {
+    const user =
+        await User.findOne({ email });
 
     if (!user) {
-        throw new Error("Invalid email or password");
+        throw new Error(
+            "Invalid email or password"
+        );
     }
 
     if (user.role !== "admin") {
-        throw new Error("Admin access required");
+        throw new Error(
+            "Admin access required"
+        );
     }
 
-    const isPasswordValid = await bcrypt.compare(
-        password,
-        user.password
-    );
+    const isPasswordValid =
+        await bcrypt.compare(
+            password,
+            user.password
+        );
 
     if (!isPasswordValid) {
-        throw new Error("Invalid email or password");
+        throw new Error(
+            "Invalid email or password"
+        );
     }
 
-    const accessToken = generateAccessToken(user);
+    // Same access token for admin
+    const accessToken =
+        generateAccessToken(user);
 
     return {
         accessToken,
+
         user: {
             id: user._id,
             name: user.name,
@@ -89,19 +137,185 @@ const adminLoginUser = async ({ email, password }) => {
     };
 };
 
-const getCurrentUser = async (userId) => {
-    const user = await User.findById(userId).select("-password");
 
-    if (!user) {
-        throw new Error("User not found");
+// Department signup
+
+const departmentSignup = async ({
+    name,
+    departmentCode,
+    email,
+    password,
+    description,
+}) => {
+    const existingName =
+        await Department.findOne({
+            name,
+        });
+
+    if (existingName) {
+        throw new Error(
+            "Department already exists"
+        );
     }
 
-    return user;
+    const existingCode =
+        await Department.findOne({
+            departmentCode:
+                departmentCode.toUpperCase(),
+        });
+
+    if (existingCode) {
+        throw new Error(
+            "Department code already exists"
+        );
+    }
+
+    const existingEmail =
+        await Department.findOne({
+            email: email.toLowerCase(),
+        });
+
+    if (existingEmail) {
+        throw new Error(
+            "Department email already exists"
+        );
+    }
+
+    const hashedPassword =
+        await bcrypt.hash(
+            password,
+            10
+        );
+
+    const department =
+        await Department.create({
+            name,
+            departmentCode:
+                departmentCode.toUpperCase(),
+            email:
+                email.toLowerCase(),
+            password: hashedPassword,
+            description,
+            isActive: true,
+        });
+
+    return {
+        id: department._id,
+        name: department.name,
+        departmentCode:
+            department.departmentCode,
+        email: department.email,
+        description:
+            department.description,
+        isActive:
+            department.isActive,
+    };
 };
+
+
+// Department login
+
+const departmentLoginUser = async ({
+    email,
+    departmentCode,
+    password,
+}) => {
+    const department =
+        await Department.findOne({
+            email: email.toLowerCase(),
+            departmentCode:
+                departmentCode.toUpperCase(),
+            isActive: true,
+        });
+
+    if (!department) {
+        throw new Error(
+            "Invalid department credentials"
+        );
+    }
+
+    const isPasswordValid =
+        await bcrypt.compare(
+            password,
+            department.password
+        );
+
+    if (!isPasswordValid) {
+        throw new Error(
+            "Invalid department credentials"
+        );
+    }
+
+    // Same access token for department
+    const accessToken =
+        generateAccessToken({
+            _id: department._id,
+            role: "department",
+        });
+
+    return {
+        accessToken,
+
+        user: {
+            id: department._id,
+            name: department.name,
+            email: department.email,
+            departmentCode:
+                department.departmentCode,
+            role: "department",
+            description:
+                department.description,
+        },
+    };
+};
+
+
+// Get current user
+
+const getCurrentUser = async (
+    userId
+) => {
+    const user =
+        await User.findById(userId)
+            .select("-password");
+
+    if (user) {
+        return user;
+    }
+
+    const department =
+        await Department.findById(
+            userId
+        ).select("-password");
+
+    if (department) {
+        return {
+            id: department._id,
+            name: department.name,
+            email: department.email,
+            departmentCode:
+                department.departmentCode,
+            role: "department",
+            description:
+                department.description,
+            isActive:
+                department.isActive,
+        };
+    }
+
+    throw new Error(
+        "User not found"
+    );
+};
+
+
+// Export
 
 export {
     registerUser,
     loginUser,
     adminLoginUser,
+    departmentSignup,
+    departmentLoginUser,
     getCurrentUser,
 };

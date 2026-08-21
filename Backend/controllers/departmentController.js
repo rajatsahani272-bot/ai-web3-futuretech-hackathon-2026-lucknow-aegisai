@@ -1,79 +1,125 @@
 import {
-  createDepartment,
-  getDepartments,
-  getDepartmentById,
-  updateDepartment,
-  deleteDepartment,
+    createDepartment,
 } from "../services/departmentService.js";
 
-export const create = async (req, res, next) => {
-  try {
-    const department = await createDepartment(req.body);
+import Department from "../models/Department.js";
+import Complaint from "../models/Complaint.js";
 
-    res.status(201).json({
-      success: true,
-      message: "Department created successfully",
-      data: department,
-    });
-  } catch (error) {
-    next(error);
-  }
+
+// Department signup
+
+export const signup = async (
+    req,
+    res,
+    next
+) => {
+    try {
+        const {
+            name,
+            departmentCode,
+            email,
+            password,
+            description,
+        } = req.body;
+
+        if (
+            !name ||
+            !departmentCode ||
+            !email ||
+            !password
+        ) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Name, department code, email and password are required",
+            });
+        }
+
+        const department =
+            await createDepartment({
+                name,
+                departmentCode,
+                email,
+                password,
+                description,
+            });
+
+        res.status(201).json({
+            success: true,
+            message:
+                "Department account created successfully",
+            data: {
+                department: {
+                    id: department._id,
+                    name: department.name,
+                    departmentCode:
+                        department.departmentCode,
+                    email: department.email,
+                    isActive:
+                        department.isActive,
+                },
+            },
+        });
+    } catch (error) {
+        next(error);
+    }
 };
 
-export const getAll = async (req, res, next) => {
-  try {
-    const departments = await getDepartments();
 
-    res.status(200).json({
-      success: true,
-      data: departments,
-    });
-  } catch (error) {
-    next(error);
-  }
+// Get all active departments
+
+export const getDepartments = async (
+    req,
+    res,
+    next
+) => {
+    try {
+        const departments =
+            await Department.find({
+                isActive: true,
+            }).select(
+                "name departmentCode"
+            );
+
+        res.status(200).json({
+            success: true,
+            data: departments,
+        });
+    } catch (error) {
+        next(error);
+    }
 };
 
-export const getById = async (req, res, next) => {
-  try {
-    const department = await getDepartmentById(
-      req.params.id
-    );
 
-    res.status(200).json({
-      success: true,
-      data: department,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+// Get complaints for department
 
-export const update = async (req, res, next) => {
-  try {
-    const department = await updateDepartment(
-      req.params.id,
-      req.body
-    );
+export const getDepartmentComplaints = async (
+    req,
+    res,
+    next
+) => {
+    try {
+        const complaints =
+            await Complaint.find({
+                department: req.user.id,
+            })
+                .sort({
+                    createdAt: -1,
+                })
+                .populate(
+                    "user",
+                    "name email"
+                )
+                .populate(
+                    "department",
+                    "name"
+                );
 
-    res.status(200).json({
-      success: true,
-      message: "Department updated successfully",
-      data: department,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const remove = async (req, res, next) => {
-  try {
-    await deleteDepartment(req.params.id);
-
-    res.status(200).json({
-      success: true,
-      message: "Department deleted successfully",
-    });
-  } catch (error) {
-    next(error);
-  }
+        res.status(200).json({
+            success: true,
+            data: complaints,
+        });
+    } catch (error) {
+        next(error);
+    }
 };

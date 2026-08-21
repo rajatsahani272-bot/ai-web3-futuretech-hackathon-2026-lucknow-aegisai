@@ -1,57 +1,88 @@
 import Complaint from "../models/Complaint.js";
 import User from "../models/User.js";
 
+
+// Get all complaints
+
 export const getAllComplaints = async () => {
   return await Complaint.find()
-    .populate("user", "name email")
-    .populate("department", "name")
-    .sort({ createdAt: -1 });
+    .populate(
+      "user",
+      "name email"
+    )
+    .populate(
+      "department",
+      "name"
+    )
+    .sort({
+      createdAt: -1,
+    });
 };
+
+
+// Get all users
 
 export const getAllUsers = async () => {
   return await User.find()
     .select("-password")
-    .sort({ createdAt: -1 });
+    .sort({
+      createdAt: -1,
+    });
 };
+
+
+// Update complaint status
 
 export const updateComplaintStatus = async (
   complaintId,
   status
 ) => {
-  const complaint = await Complaint.findByIdAndUpdate(
-    complaintId,
-    { status },
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
+  const complaint =
+    await Complaint.findByIdAndUpdate(
+      complaintId,
+      {
+        status,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
   if (!complaint) {
-    throw new Error("Complaint not found");
+    throw new Error(
+      "Complaint not found"
+    );
   }
 
   return complaint;
 };
 
+
+// Assign complaint to department
+
 export const assignComplaint = async (
   complaintId,
   departmentId
 ) => {
-  const complaint = await Complaint.findByIdAndUpdate(
-    complaintId,
-    {
-      department: departmentId,
-      status: "assigned",
-    },
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
+  const complaint =
+    await Complaint.findByIdAndUpdate(
+      complaintId,
+      {
+        department:
+          departmentId,
+        status: "assigned",
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
   if (!complaint) {
-    throw new Error("Complaint not found");
+    throw new Error(
+      "Complaint not found"
+    );
   }
 
   return complaint;

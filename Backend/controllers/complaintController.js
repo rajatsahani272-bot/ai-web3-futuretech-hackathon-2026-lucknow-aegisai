@@ -8,18 +8,42 @@ import {
   updateComplaintByAdmin,
 } from "../services/complaintService.js";
 
-export const create = async (req, res, next) => {
+
+// Create Complaint
+
+export const create = async (
+  req,
+  res,
+  next
+) => {
   try {
     const complaintData = {
       ...req.body,
       user: req.user.id,
+      image: req.file
+        ? req.file.path
+        : null,
     };
 
-    const complaint = await createComplaint(complaintData);
+    if (
+      typeof complaintData.location ===
+      "string"
+    ) {
+      complaintData.location =
+        JSON.parse(
+          complaintData.location
+        );
+    }
+
+    const complaint =
+      await createComplaint(
+        complaintData
+      );
 
     res.status(201).json({
       success: true,
-      message: "Complaint created successfully",
+      message:
+        "Complaint created successfully",
       data: complaint,
     });
   } catch (error) {
@@ -27,9 +51,19 @@ export const create = async (req, res, next) => {
   }
 };
 
-export const getMyComplaints = async (req, res, next) => {
+
+// Get My Complaints
+
+export const getMyComplaints = async (
+  req,
+  res,
+  next
+) => {
   try {
-    const complaints = await getUserComplaints(req.user.id);
+    const complaints =
+      await getUserComplaints(
+        req.user.id
+      );
 
     res.status(200).json({
       success: true,
@@ -40,9 +74,19 @@ export const getMyComplaints = async (req, res, next) => {
   }
 };
 
-export const getById = async (req, res, next) => {
+
+// Get Complaint By ID
+
+export const getById = async (
+  req,
+  res,
+  next
+) => {
   try {
-    const complaint = await getComplaintById(req.params.id);
+    const complaint =
+      await getComplaintById(
+        req.params.id
+      );
 
     res.status(200).json({
       success: true,
@@ -53,16 +97,25 @@ export const getById = async (req, res, next) => {
   }
 };
 
-export const update = async (req, res, next) => {
+
+// Update Complaint
+
+export const update = async (
+  req,
+  res,
+  next
+) => {
   try {
-    const complaint = await updateComplaintByAdmin(
-      req.params.id,
-      req.body
-    );
+    const complaint =
+      await updateComplaintByAdmin(
+        req.params.id,
+        req.body
+      );
 
     res.status(200).json({
       success: true,
-      message: "Complaint updated successfully",
+      message:
+        "Complaint updated successfully",
       data: complaint,
     });
   } catch (error) {
@@ -70,7 +123,14 @@ export const update = async (req, res, next) => {
   }
 };
 
-export const remove = async (req, res, next) => {
+
+// Delete Complaint
+
+export const remove = async (
+  req,
+  res,
+  next
+) => {
   try {
     await deleteComplaint(
       req.params.id,
@@ -79,16 +139,25 @@ export const remove = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "Complaint deleted successfully",
+      message:
+        "Complaint deleted successfully",
     });
   } catch (error) {
     next(error);
   }
 };
 
-export const getAll = async (req, res, next) => {
+
+// Get All Complaints - Admin
+
+export const getAll = async (
+  req,
+  res,
+  next
+) => {
   try {
-    const complaints = await getAllComplaints();
+    const complaints =
+      await getAllComplaints();
 
     res.status(200).json({
       success: true,
