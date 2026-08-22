@@ -1,8 +1,6 @@
 import Complaint from "../models/Complaint.js";
 import User from "../models/User.js";
-
-
-// Get all complaints
+import Department from "../models/Department.js";
 
 export const getAllComplaints = async () => {
   return await Complaint.find()
@@ -12,15 +10,12 @@ export const getAllComplaints = async () => {
     )
     .populate(
       "department",
-      "name"
+      "name departmentCode"
     )
     .sort({
       createdAt: -1,
     });
 };
-
-
-// Get all users
 
 export const getAllUsers = async () => {
   return await User.find()
@@ -30,60 +25,97 @@ export const getAllUsers = async () => {
     });
 };
 
+export const updateComplaintStatus =
+  async (
+    complaintId,
+    status
+  ) => {
+    const complaint =
+      await Complaint.findById(
+        complaintId
+      );
 
-// Update complaint status
+    if (!complaint) {
+      throw new Error(
+        "Complaint not found"
+      );
+    }
 
-export const updateComplaintStatus = async (
-  complaintId,
-  status
-) => {
-  const complaint =
-    await Complaint.findByIdAndUpdate(
-      complaintId,
-      {
+    if (
+      complaint.status !== status
+    ) {
+      complaint.status = status;
+
+      complaint.statusHistory.push({
         status,
-      },
-      {
-        new: true,
-        runValidators: true,
-      }
+        timestamp: new Date(),
+      });
+    }
+
+    await complaint.save();
+
+    await complaint.populate(
+      "user",
+      "name email"
     );
 
-  if (!complaint) {
-    throw new Error(
-      "Complaint not found"
-    );
-  }
-
-  return complaint;
-};
-
-
-// Assign complaint to department
-
-export const assignComplaint = async (
-  complaintId,
-  departmentId
-) => {
-  const complaint =
-    await Complaint.findByIdAndUpdate(
-      complaintId,
-      {
-        department:
-          departmentId,
-        status: "assigned",
-      },
-      {
-        new: true,
-        runValidators: true,
-      }
+    await complaint.populate(
+      "department",
+      "name departmentCode"
     );
 
-  if (!complaint) {
-    throw new Error(
-      "Complaint not found"
-    );
-  }
+    return complaint;
+  };
 
-  return complaint;
-};
+export const assignComplaint =
+  async (
+    complaintId,
+    departmentId
+  ) => {
+    const complaint =
+      await Complaint.findById(
+        complaintId
+      );
+
+    if (!complaint) {
+      throw new Error(
+        "Complaint not found"
+      );
+    }
+
+    const department =
+      await Department.findById(
+        departmentId
+      );
+
+    if (!department) {
+      throw new Error(
+        "Department not found"
+      );
+    }
+
+    complaint.department =
+      department._id;
+
+    complaint.status =
+      "assigned";
+
+    complaint.statusHistory.push({
+      status: "assigned",
+      timestamp: new Date(),
+    });
+
+    await complaint.save();
+
+    await complaint.populate(
+      "user",
+      "name email"
+    );
+
+    await complaint.populate(
+      "department",
+      "name departmentCode"
+    );
+
+    return complaint;
+  };

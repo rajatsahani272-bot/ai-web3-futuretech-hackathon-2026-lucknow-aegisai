@@ -11,11 +11,19 @@ import adminMiddleware from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
 
-router.use(adminMiddleware);
+router.use(
+  adminMiddleware
+);
 
-router.get("/complaints", complaints);
+router.get(
+  "/complaints",
+  complaints
+);
 
-router.get("/users", users);
+router.get(
+  "/users",
+  users
+);
 
 router.patch(
   "/complaints/:id/status",

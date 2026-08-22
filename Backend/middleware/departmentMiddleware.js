@@ -13,7 +13,7 @@ const departmentMiddleware = (
       return res.status(401).json({
         success: false,
         message:
-          "Authentication required",
+          "Department authentication required",
       });
     }
 
@@ -22,7 +22,10 @@ const departmentMiddleware = (
       process.env.ACCESS_TOKEN_SECRET
     );
 
-    if (decoded.role !== "department") {
+    if (
+      decoded.role !==
+      "department"
+    ) {
       return res.status(403).json({
         success: false,
         message:
@@ -33,10 +36,9 @@ const departmentMiddleware = (
     req.user = decoded;
 
     next();
-
   } catch (error) {
     console.error(
-      "Department middleware error:",
+      "Department authentication error:",
       error.message
     );
 

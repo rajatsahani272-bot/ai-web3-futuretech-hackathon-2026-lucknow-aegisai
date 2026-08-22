@@ -1,7 +1,9 @@
 import bcrypt from "bcryptjs";
 import Department from "../models/Department.js";
 
-export const createDepartment = async (data) => {
+export const createDepartment = async (
+  data
+) => {
   const {
     name,
     departmentCode,
@@ -10,23 +12,23 @@ export const createDepartment = async (data) => {
     description,
   } = data;
 
-  const normalizedCode =
+  const code =
     departmentCode.toUpperCase();
 
-  const normalizedEmail =
+  const departmentEmail =
     email.toLowerCase();
 
   const existingDepartment =
     await Department.findOne({
       $or: [
-        { name },
         {
-          departmentCode:
-            normalizedCode,
+          name,
         },
         {
-          email:
-            normalizedEmail,
+          departmentCode: code,
+        },
+        {
+          email: departmentEmail,
         },
       ],
     });
@@ -34,7 +36,7 @@ export const createDepartment = async (data) => {
   if (existingDepartment) {
     if (
       existingDepartment.departmentCode ===
-      normalizedCode
+      code
     ) {
       throw new Error(
         "Department code already exists"
@@ -43,7 +45,7 @@ export const createDepartment = async (data) => {
 
     if (
       existingDepartment.email ===
-      normalizedEmail
+      departmentEmail
     ) {
       throw new Error(
         "Department email already exists"
@@ -69,12 +71,9 @@ export const createDepartment = async (data) => {
   const department =
     await Department.create({
       name,
-      departmentCode:
-        normalizedCode,
-      email:
-        normalizedEmail,
-      password:
-        hashedPassword,
+      departmentCode: code,
+      email: departmentEmail,
+      password: hashedPassword,
       description,
       isActive: true,
     });

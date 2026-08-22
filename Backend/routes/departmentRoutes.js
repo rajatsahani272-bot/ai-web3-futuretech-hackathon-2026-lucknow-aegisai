@@ -1,39 +1,31 @@
 import express from "express";
 
 import {
-    signup,
-    getDepartments,
-    getDepartmentComplaints,
+  signup,
+  getDepartments,
+  getDepartmentComplaints,
 } from "../controllers/departmentController.js";
 
+import authMiddleware from "../middleware/authMiddleware.js";
 import departmentMiddleware from "../middleware/departmentMiddleware.js";
 
 const router = express.Router();
 
-
-// Department signup
-
 router.post(
-    "/signup",
-    signup
+  "/signup",
+  signup
 );
 
-
-// Get departments
-
 router.get(
-    "/",
-    departmentMiddleware,
-    getDepartments
+  "/",
+  authMiddleware,
+  getDepartments
 );
 
-
-// Department complaints
-
 router.get(
-    "/complaints",
-    departmentMiddleware,
-    getDepartmentComplaints
+  "/complaints",
+  departmentMiddleware,
+  getDepartmentComplaints
 );
 
 export default router;

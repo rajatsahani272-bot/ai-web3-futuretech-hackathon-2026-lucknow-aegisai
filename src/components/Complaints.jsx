@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import api from "../api/axios.js";
 import StatusBadge from "./StatusBadge";
 
+
 export default function Complaints({
   setPage,
   setSelected,
@@ -35,9 +36,9 @@ export default function Complaints({
   const filtered = useMemo(() => {
     return complaints.filter((c) => {
       const matchesFilter =
-        filter === "All" || c.status === filter;
+        filter === "All" ||
+        c.status?.toLowerCase() === filter.toLowerCase();
 
-      // Location can be an object
       const locationText =
         typeof c.location === "object"
           ? [
@@ -45,6 +46,8 @@ export default function Complaints({
               c.location?.name,
               c.location?.city,
               c.location?.area,
+              c.location?.latitude,
+              c.location?.longitude,
             ]
               .filter(Boolean)
               .join(" ")
@@ -105,6 +108,7 @@ export default function Complaints({
             <tr>
               <th>ID</th>
               <th>Complaint</th>
+              <th>Image</th>
               <th>Category</th>
               <th>Location</th>
               <th>Severity</th>
@@ -116,7 +120,6 @@ export default function Complaints({
           <tbody>
             {filtered.length > 0 ? (
               filtered.map((c) => {
-                // Convert location object into readable text
                 const locationText =
                   typeof c.location === "object"
                     ? [
@@ -136,6 +139,18 @@ export default function Complaints({
                     <td>
                       <b>{c.title || "Untitled"}</b>
                       <small>{c.date || ""}</small>
+                    </td>
+
+                    <td>
+                      {c.image ? (
+                        <img
+                          src={c.image}
+                          alt={c.title || "Complaint"}
+                          className="complaint-image"
+                        />
+                      ) : (
+                        <span>No Image</span>
+                      )}
                     </td>
 
                     <td>
@@ -180,7 +195,7 @@ export default function Complaints({
               })
             ) : (
               <tr>
-                <td colSpan="7">
+                <td colSpan="8">
                   No complaints found.
                 </td>
               </tr>

@@ -5,42 +5,70 @@ import {
   getAllUsers,
 } from "../services/adminService.js";
 
-export const complaints = async (req, res, next) => {
+export const complaints = async (
+  req,
+  res,
+  next
+) => {
   try {
-    const complaints = await getAllComplaints();
+    const data =
+      await getAllComplaints();
 
     res.status(200).json({
       success: true,
-      data: complaints,
+      data,
     });
   } catch (error) {
     next(error);
   }
 };
 
-export const users = async (req, res, next) => {
+export const users = async (
+  req,
+  res,
+  next
+) => {
   try {
-    const users = await getAllUsers();
+    const data =
+      await getAllUsers();
 
     res.status(200).json({
       success: true,
-      data: users,
+      data,
     });
   } catch (error) {
     next(error);
   }
 };
 
-export const updateStatus = async (req, res, next) => {
+export const updateStatus = async (
+  req,
+  res,
+  next
+) => {
   try {
-    const complaint = await updateComplaintStatus(
-      req.params.id,
-      req.body.status
-    );
+    const {
+      status,
+    } = req.body;
+
+    if (!status) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Status is required",
+      });
+    }
+
+    const complaint =
+      await updateComplaintStatus(
+        req.params.id,
+        status
+      );
 
     res.status(200).json({
       success: true,
-      message: "Complaint status updated",
+      message:
+        "Complaint status updated",
       data: complaint,
     });
   } catch (error) {
@@ -48,16 +76,34 @@ export const updateStatus = async (req, res, next) => {
   }
 };
 
-export const assignDepartment = async (req, res, next) => {
+export const assignDepartment = async (
+  req,
+  res,
+  next
+) => {
   try {
-    const complaint = await assignComplaint(
-      req.params.id,
-      req.body.departmentId
-    );
+    const {
+      departmentId,
+    } = req.body;
+
+    if (!departmentId) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Department ID is required",
+      });
+    }
+
+    const complaint =
+      await assignComplaint(
+        req.params.id,
+        departmentId
+      );
 
     res.status(200).json({
       success: true,
-      message: "Complaint assigned successfully",
+      message:
+        "Complaint assigned successfully",
       data: complaint,
     });
   } catch (error) {

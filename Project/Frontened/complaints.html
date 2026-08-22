@@ -44,99 +44,236 @@
 <script src="js/script.js"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", async function () {
 
-    const complaintList =
-        document.getElementById("complaintList");
+async function getLocationName(latitude, longitude) {
 
-    const complaints = await getMyComplaints();
-
-    if (!complaints || complaints.length === 0) {
-        complaintList.innerHTML = `
-            <div class="complaint-card">
-                <div class="complaint-info">
-                    <h2>No Complaints Found</h2>
-                    <p>You have not submitted any complaints yet.</p>
-                </div>
-            </div>
-        `;
-        return;
+    if (
+        latitude === undefined ||
+        longitude === undefined ||
+        latitude === null ||
+        longitude === null
+    ) {
+        return "Location unavailable";
     }
 
-    complaintList.innerHTML = complaints.map(function (complaint) {
+    try {
 
-        const date = complaint.createdAt
-            ? new Date(complaint.createdAt).toLocaleDateString(
-                "en-IN",
-                {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric"
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+            {
+                headers: {
+                    "Accept": "application/json"
                 }
-            )
-            : "Date unavailable";
+            }
+        );
 
-        const status =
-            complaint.status || "Pending";
+        if (!response.ok) {
+            throw new Error("Location request failed");
+        }
 
-        const statusClass =
-            status.toLowerCase().replace(/\s+/g, "-");
+        const data = await response.json();
 
-        const latitude =
-            complaint.location?.latitude;
+        const address = data.address || {};
 
-        const longitude =
-            complaint.location?.longitude;
+        const locationName =
+            address.road ||
+            address.neighbourhood ||
+            address.suburb ||
+            address.village ||
+            address.town ||
+            address.city ||
+            data.display_name;
 
-        const location =
-            latitude && longitude
-                ? `${latitude}, ${longitude}`
-                : "Location unavailable";
+        return locationName || "Location unavailable";
 
-        return `
-            <div class="complaint-card">
+    } catch (error) {
 
-                <div class="complaint-info">
+        console.error(
+            "Failed to get location name:",
+            error
+        );
 
-                    <span class="complaint-id">
-                        #${complaint._id}
-                    </span>
+        return "Location unavailable";
+    }
+}
 
-                    <h2>
-                        ${complaint.title || "Untitled Complaint"}
-                    </h2>
 
-                    <p>
-                        📂 ${complaint.category || "Other"}
-                    </p>
+document.addEventListener(
+    "DOMContentLoaded",
+    async function () {
 
-                    <p>
-                        📍 ${location}
-                    </p>
+        const complaintList =
+            document.getElementById(
+                "complaintList"
+            );
 
-                    <p>
-                        📅 ${date}
-                    </p>
+        const complaints =
+            await getMyComplaints();
+
+        if (
+            !complaints ||
+            complaints.length === 0
+        ) {
+
+            complaintList.innerHTML = `
+                <div class="complaint-card">
+
+                    <div class="complaint-info">
+
+                        <h2>No Complaints Found</h2>
+
+                        <p>
+                            You have not submitted
+                            any complaints yet.
+                        </p>
+
+                    </div>
 
                 </div>
+            `;
 
-                <div class="status ${statusClass}">
-                    ${status}
-                </div>
+            return;
+        }
 
-                <a
-                    href="details.html?id=${complaint._id}"
-                    class="track-btn"
-                >
-                    Track →
-                </a>
 
-            </div>
-        `;
+        complaintList.innerHTML =
+            complaints.map(function (complaint) {
 
-    }).join("");
+                const date =
+                    complaint.createdAt
+                        ? new Date(
+                            complaint.createdAt
+                        ).toLocaleDateString(
+                            "en-IN",
+                            {
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric"
+                            }
+                        )
+                        : "Date unavailable";
 
-});
+
+                const status =
+                    complaint.status ||
+                    "pending";
+
+
+                const statusClass =
+                    status
+                        .toLowerCase()
+                        .replace(/\s+/g, "-");
+
+
+                return `
+                    <div
+                        class="complaint-card"
+                        data-id="${complaint._id}"
+                    >
+
+                        <div class="complaint-info">
+
+                            <span class="complaint-id">
+                                #${complaint._id}
+                            </span>
+
+                            <h2>
+                                ${
+                                    complaint.title ||
+                                    "Untitled Complaint"
+                                }
+                            </h2>
+
+                            <p>
+                                📂
+                                ${
+                                    complaint.category ||
+                                    "Other"
+                                }
+                            </p>
+
+                            <p
+                                class="complaint-location"
+                                data-lat="${
+                                    complaint.location?.latitude
+                                }"
+                                data-lng="${
+                                    complaint.location?.longitude
+                                }"
+                            >
+                                📍 Finding location...
+                            </p>
+
+                            <p>
+                                📅 ${date}
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            class="status ${statusClass}"
+                        >
+                            ${status}
+                        </div>
+
+
+                        <a
+                            href="details.html?id=${complaint._id}"
+                            class="track-btn"
+                        >
+                            Track →
+                        </a>
+
+                    </div>
+                `;
+
+            }).join("");
+
+
+        const locationElements =
+            document.querySelectorAll(
+                ".complaint-location"
+            );
+
+
+        for (
+            const element of locationElements
+        ) {
+
+            const latitude =
+                element.dataset.lat;
+
+            const longitude =
+                element.dataset.lng;
+
+
+            if (
+                !latitude ||
+                !longitude
+            ) {
+
+                element.innerText =
+                    "📍 Location unavailable";
+
+                continue;
+            }
+
+
+            const locationName =
+                await getLocationName(
+                    latitude,
+                    longitude
+                );
+
+
+            element.innerText =
+                `📍 ${locationName}`;
+        }
+
+    }
+);
+
 </script>
 
 </body>

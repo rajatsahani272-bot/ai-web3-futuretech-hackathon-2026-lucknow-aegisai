@@ -17,12 +17,15 @@ const adminMiddleware = (
       });
     }
 
-    const decoded = jwt.verify(
-      token,
-      process.env.ACCESS_TOKEN_SECRET
-    );
+    const decoded =
+      jwt.verify(
+        token,
+        process.env.ACCESS_TOKEN_SECRET
+      );
 
-    if (decoded.role !== "admin") {
+    if (
+      decoded.role !== "admin"
+    ) {
       return res.status(403).json({
         success: false,
         message:
@@ -33,7 +36,6 @@ const adminMiddleware = (
     req.user = decoded;
 
     next();
-
   } catch (error) {
     console.error(
       "Admin middleware error:",
