@@ -180,17 +180,18 @@ export const logout = (
     res.clearCookie(
         "accessToken",
         {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
             path: "/",
         }
     );
 
     res.status(200).json({
         success: true,
-        message:
-            "Logout successful",
+        message: "Logout successful",
     });
 };
-
 
 // Current user
 
