@@ -25,7 +25,9 @@ const allowedOrigins = [
     "https://ai-web3-futuretech-hackathon-2026-l.vercel.app",
 
     // User Frontend
-    "https://ai-web3-futuretech-hackathon-2026-lucknow-aegisai-4lkoveql0.vercel.app"
+    "https://ai-web3-futuretech-hackathon-2026-l.vercel.app",
+    "https://ai-web3-futuretech-hackathon-2026-l-two.vercel.app"
+
 ];
 app.use(
     cors({
