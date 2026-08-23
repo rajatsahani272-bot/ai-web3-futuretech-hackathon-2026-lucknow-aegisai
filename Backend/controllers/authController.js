@@ -46,13 +46,12 @@ export const login = async (
             "accessToken",
             result.accessToken,
             {
-                httpOnly: true,
-                secure: false,
-                sameSite: "lax",
-                path: "/",
-                maxAge:
-                    15 * 60 * 1000,
-            }
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    maxAge: 15 * 60 * 1000,
+}
         );
 
         res.status(200).json({
@@ -83,14 +82,13 @@ export const adminLogin = async (
         res.cookie(
             "accessToken",
             result.accessToken,
-            {
-                httpOnly: true,
-                secure: false,
-                sameSite: "lax",
-                path: "/",
-                maxAge:
-                    15 * 60 * 1000,
-            }
+           {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    maxAge: 15 * 60 * 1000,
+}
         );
 
         res.status(200).json({
@@ -150,14 +148,13 @@ export const departmentLogin = async (
         res.cookie(
             "accessToken",
             result.accessToken,
-            {
-                httpOnly: true,
-                secure: false,
-                sameSite: "lax",
-                path: "/",
-                maxAge:
-                    15 * 60 * 1000,
-            }
+         {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    maxAge: 15 * 60 * 1000,
+}
         );
 
         res.status(200).json({
