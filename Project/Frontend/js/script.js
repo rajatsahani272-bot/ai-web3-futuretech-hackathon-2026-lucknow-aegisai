@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:5000/api";
+const API_URL = "https://ai-web3-futuretech-hackathon-2026-gagc.onrender.com/api";
 
 let signupMode = false;
 
