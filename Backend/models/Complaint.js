@@ -27,16 +27,22 @@ const complaintSchema = new mongoose.Schema(
     },
 
     location: {
-      latitude: {
-        type: Number,
-        required: true,
-      },
+  latitude: {
+    type: Number,
+    required: true,
+  },
 
-      longitude: {
-        type: Number,
-        required: true,
-      },
-    },
+  longitude: {
+    type: Number,
+    required: true,
+  },
+
+  address: {
+    type: String,
+    default: null,
+    trim: true,
+  },
+},
 
     image: {
       type: String,
@@ -48,6 +54,21 @@ const complaintSchema = new mongoose.Schema(
       enum: ["pending", "assigned", "in-progress", "resolved"],
       default: "pending",
     },
+
+    statusHistory: [
+      {
+        status: {
+          type: String,
+          enum: ["pending", "assigned", "in-progress", "resolved"],
+          required: true,
+        },
+
+        timestamp: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
 
     priority: {
       type: String,
@@ -66,6 +87,9 @@ const complaintSchema = new mongoose.Schema(
   }
 );
 
-const Complaint = mongoose.model("Complaint", complaintSchema);
+const Complaint = mongoose.model(
+  "Complaint",
+  complaintSchema
+);
 
 export default Complaint;

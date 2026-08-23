@@ -1,14 +1,26 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import api from "../api/axios.js";
 import StatusBadge from "./StatusBadge";
 import StatCard from "./StatCard";
 import MapPreview from "./MapPreview";
 
-function Progress({ label, value, percent, cls }) {
+
+function Progress({
+  label,
+  value,
+  percent,
+  cls,
+}) {
   return (
     <div className="progress-box">
       <div>
         <span>{label}</span>
+
         <b>
           {value} ({percent}%)
         </b>
@@ -17,12 +29,15 @@ function Progress({ label, value, percent, cls }) {
       <div className="progress-track">
         <div
           className={`progress-fill ${cls}`}
-          style={{ width: `${percent}%` }}
+          style={{
+            width: `${percent}%`,
+          }}
         />
       </div>
     </div>
   );
 }
+
 
 export default function Dashboard({
   setPage,
@@ -30,186 +45,325 @@ export default function Dashboard({
   setFilter,
   user,
 }) {
-  const [complaints, setComplaints] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [complaints, setComplaints] =
+    useState([]);
 
-  // =========================
-  // FETCH COMPLAINTS
-  // =========================
+  const [loading, setLoading] =
+    useState(true);
+
+
+  // Fetch complaints
+
   useEffect(() => {
-    const fetchComplaints = async () => {
-      try {
-        const response = await api.get("/complaints");
+    const fetchComplaints =
+      async () => {
+        try {
+          const response =
+            await api.get(
+              "/admin/complaints"
+            );
 
-        const data = response.data.data || response.data || [];
+          const data =
+            response.data.data ||
+            response.data ||
+            [];
 
-        setComplaints(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("Failed to fetch dashboard complaints:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+          setComplaints(
+            Array.isArray(data)
+              ? data
+              : []
+          );
+        } catch (error) {
+          console.error(
+            "Failed to fetch dashboard complaints:",
+            error
+          );
+
+          setComplaints([]);
+        } finally {
+          setLoading(false);
+        }
+      };
 
     fetchComplaints();
   }, []);
 
-  // =========================
-  // STATUS COUNTS
-  // =========================
-  const totalComplaints = complaints.length;
 
-  const pendingComplaints = complaints.filter(
-    (c) => c.status === "pending"
-  ).length;
+  // Status counts
 
-  const assignedComplaints = complaints.filter(
-    (c) => c.status === "assigned"
-  ).length;
+  const totalComplaints =
+    complaints.length;
 
-  const inProgressComplaints = complaints.filter(
-    (c) => c.status === "in-progress"
-  ).length;
+  const pendingComplaints =
+    complaints.filter(
+      (complaint) =>
+        complaint.status ===
+        "pending"
+    ).length;
 
-  const resolvedComplaints = complaints.filter(
-    (c) => c.status === "resolved"
-  ).length;
+  const assignedComplaints =
+    complaints.filter(
+      (complaint) =>
+        complaint.status ===
+        "assigned"
+    ).length;
 
-  // =========================
-  // CITIZENS
-  // =========================
+  const inProgressComplaints =
+    complaints.filter(
+      (complaint) =>
+        complaint.status ===
+        "in-progress"
+    ).length;
+
+  const resolvedComplaints =
+    complaints.filter(
+      (complaint) =>
+        complaint.status ===
+        "resolved"
+    ).length;
+
+
+  // Citizens
+
   const citizens = useMemo(() => {
-    const users = complaints
-      .map((complaint) => complaint.user?._id)
-      .filter(Boolean);
+    const users =
+      complaints
+        .map(
+          (complaint) =>
+            complaint.user?._id
+        )
+        .filter(Boolean);
 
     return new Set(users).size;
   }, [complaints]);
 
-  // =========================
-  // STATUS PERCENTAGES
-  // =========================
-  const getPercentage = (count) => {
-    if (totalComplaints === 0) return 0;
 
-    return Number(((count / totalComplaints) * 100).toFixed(1));
+  // Percentage
+
+  const getPercentage = (
+    count
+  ) => {
+    if (
+      totalComplaints === 0
+    ) {
+      return 0;
+    }
+
+    return Number(
+      (
+        (count /
+          totalComplaints) *
+        100
+      ).toFixed(1)
+    );
   };
 
-  const pendingPercent = getPercentage(pendingComplaints);
-  const assignedPercent = getPercentage(assignedComplaints);
-  const inProgressPercent = getPercentage(inProgressComplaints);
-  const resolvedPercent = getPercentage(resolvedComplaints);
 
-  // =========================
-  // CATEGORY DATA
-  // =========================
-  const categoryData = useMemo(() => {
-    const categoryMap = {};
+  const pendingPercent =
+    getPercentage(
+      pendingComplaints
+    );
 
-    complaints.forEach((complaint) => {
-      const category = complaint.category || "Other";
+  const assignedPercent =
+    getPercentage(
+      assignedComplaints
+    );
 
-      categoryMap[category] = (categoryMap[category] || 0) + 1;
-    });
+  const inProgressPercent =
+    getPercentage(
+      inProgressComplaints
+    );
 
-    return Object.entries(categoryMap)
-      .map(([name, count]) => ({
-        name,
-        count,
-        percentage: getPercentage(count),
-      }))
-      .sort((a, b) => b.count - a.count);
-  }, [complaints, totalComplaints]);
+  const resolvedPercent =
+    getPercentage(
+      resolvedComplaints
+    );
 
-  // =========================
-  // RECENT COMPLAINTS
-  // =========================
-  const recentComplaints = useMemo(() => {
-    return [...complaints]
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt || 0) -
-          new Date(a.createdAt || 0)
+
+  // Category data
+
+  const categoryData = useMemo(
+    () => {
+      const categoryMap = {};
+
+      complaints.forEach(
+        (complaint) => {
+          const category =
+            complaint.category ||
+            "Other";
+
+          categoryMap[category] =
+            (categoryMap[
+              category
+            ] || 0) + 1;
+        }
+      );
+
+      return Object.entries(
+        categoryMap
       )
-      .slice(0, 5);
-  }, [complaints]);
+        .map(
+          ([name, count]) => ({
+            name,
+            count,
+            percentage:
+              getPercentage(
+                count
+              ),
+          })
+        )
+        .sort(
+          (a, b) =>
+            b.count - a.count
+        );
+    },
+    [
+      complaints,
+      totalComplaints,
+    ]
+  );
 
-  // =========================
-  // FILTER HANDLER
-  // =========================
-  const handleCardClick = (statusFilter) => {
+
+  // Recent complaints
+
+  const recentComplaints =
+    useMemo(() => {
+      return [...complaints]
+        .sort(
+          (a, b) =>
+            new Date(
+              b.createdAt || 0
+            ) -
+            new Date(
+              a.createdAt || 0
+            )
+        )
+        .slice(0, 5);
+    }, [complaints]);
+
+
+  // Filter
+
+  const handleCardClick = (
+    statusFilter
+  ) => {
     setFilter(statusFilter);
     setPage("Complaints");
   };
 
-  // =========================
-  // LOADING
-  // =========================
+
+  // Loading
+
   if (loading) {
-    return <div>Loading dashboard...</div>;
+    return (
+      <div>
+        Loading dashboard...
+      </div>
+    );
   }
+
 
   return (
     <>
-      {/* =========================
-          HEADER
-      ========================= */}
+      {/* Header */}
+
       <div className="page-head">
         <div>
-          <h1>Dashboard</h1>
+          <h1>
+            Dashboard
+          </h1>
 
           <p>
-            Welcome back, {user?.name || "User"}!
+            Welcome back,{" "}
+            {user?.name ||
+              "User"}
+            !
           </p>
         </div>
 
         <select className="date-select">
-          <option>All Time</option>
-          <option>Last 7 days</option>
-          <option>Last 30 days</option>
+          <option>
+            All Time
+          </option>
+
+          <option>
+            Last 7 days
+          </option>
+
+          <option>
+            Last 30 days
+          </option>
         </select>
       </div>
 
-      {/* =========================
-          STAT CARDS
-      ========================= */}
+
+      {/* Stat cards */}
+
       <div className="stats-grid">
 
         <StatCard
           icon="▦"
-          value={totalComplaints}
+          value={
+            totalComplaints
+          }
           label="Total Complaints"
           sub="All complaints"
           cls="blue"
-          onClick={() => handleCardClick("All")}
+          onClick={() =>
+            handleCardClick(
+              "All"
+            )
+          }
         />
+
 
         <StatCard
           icon="✓"
-          value={resolvedComplaints}
+          value={
+            resolvedComplaints
+          }
           label="Resolved"
           sub={`${resolvedPercent}% of total`}
           cls="green"
-          onClick={() => handleCardClick("resolved")}
+          onClick={() =>
+            handleCardClick(
+              "resolved"
+            )
+          }
         />
+
 
         <StatCard
           icon="◷"
-          value={inProgressComplaints}
+          value={
+            inProgressComplaints
+          }
           label="In Progress"
           sub={`${inProgressPercent}% of total`}
           cls="purple"
-          onClick={() => handleCardClick("in-progress")}
+          onClick={() =>
+            handleCardClick(
+              "in-progress"
+            )
+          }
         />
+
 
         <StatCard
           icon="!"
-          value={pendingComplaints}
+          value={
+            pendingComplaints
+          }
           label="Pending"
           sub={`${pendingPercent}% of total`}
           cls="orange"
-          onClick={() => handleCardClick("pending")}
+          onClick={() =>
+            handleCardClick(
+              "pending"
+            )
+          }
         />
+
 
         <StatCard
           icon="♙"
@@ -217,115 +371,195 @@ export default function Dashboard({
           label="Citizens"
           sub="Registered complainants"
           cls="teal"
-          onClick={() => setPage("Profile")}
+          onClick={() =>
+            setPage("Profile")
+          }
         />
 
       </div>
 
-      {/* =========================
-          DASHBOARD GRID
-      ========================= */}
+
+      {/* Dashboard grid */}
+
       <div className="dashboard-grid">
 
-        {/* =========================
-            COMPLAINTS OVERVIEW
-        ========================= */}
+        {/* Complaints overview */}
+
         <section className="panel">
+
           <div className="panel-title">
-            <h2>Complaints Overview</h2>
+            <h2>
+              Complaints Overview
+            </h2>
           </div>
+
 
           <Progress
             label="Resolved"
-            value={resolvedComplaints}
-            percent={resolvedPercent}
+            value={
+              resolvedComplaints
+            }
+            percent={
+              resolvedPercent
+            }
             cls="green-bar"
           />
 
+
           <Progress
             label="In Progress"
-            value={inProgressComplaints}
-            percent={inProgressPercent}
+            value={
+              inProgressComplaints
+            }
+            percent={
+              inProgressPercent
+            }
             cls="blue-bar"
           />
 
+
           <Progress
             label="Assigned"
-            value={assignedComplaints}
-            percent={assignedPercent}
+            value={
+              assignedComplaints
+            }
+            percent={
+              assignedPercent
+            }
             cls="purple-bar"
           />
 
+
           <Progress
             label="Pending"
-            value={pendingComplaints}
-            percent={pendingPercent}
+            value={
+              pendingComplaints
+            }
+            percent={
+              pendingPercent
+            }
             cls="orange-bar"
           />
+
         </section>
 
-        {/* =========================
-            CATEGORY
-        ========================= */}
+
+        {/* Category */}
+
         <section className="panel">
 
           <div className="panel-title">
-            <h2>Complaints by Category</h2>
+            <h2>
+              Complaints by Category
+            </h2>
           </div>
+
 
           <div className="donut-wrap">
 
             <div
               className="donut"
-              style={{ cursor: "pointer" }}
-              onClick={() => handleCardClick("All")}
+              style={{
+                cursor:
+                  "pointer",
+              }}
+              onClick={() =>
+                handleCardClick(
+                  "All"
+                )
+              }
             >
-              <strong>{totalComplaints}</strong>
-              <small>Total</small>
+              <strong>
+                {
+                  totalComplaints
+                }
+              </strong>
+
+              <small>
+                Total
+              </small>
             </div>
+
 
             <div className="category-list">
 
-              {categoryData.length > 0 ? (
-                categoryData.map((category, index) => (
-                  <div
-                    className="category-row"
-                    key={category.name}
-                    style={{ cursor: "pointer" }}
-                    onClick={() => handleCardClick("All")}
-                  >
-                    <i className={`dot c${index + 1}`} />
+              {categoryData.length >
+              0 ? (
+                categoryData.map(
+                  (
+                    category,
+                    index
+                  ) => (
+                    <div
+                      className="category-row"
+                      key={
+                        category.name
+                      }
+                      style={{
+                        cursor:
+                          "pointer",
+                      }}
+                      onClick={() =>
+                        handleCardClick(
+                          "All"
+                        )
+                      }
+                    >
+                      <i
+                        className={`dot c${
+                          index +
+                          1
+                        }`}
+                      />
 
-                    <span>
-                      {category.name}
-                    </span>
+                      <span>
+                        {
+                          category.name
+                        }
+                      </span>
 
-                    <b>
-                      {category.percentage}%
-                    </b>
-                  </div>
-                ))
+                      <b>
+                        {
+                          category.percentage
+                        }
+                        %
+                      </b>
+                    </div>
+                  )
+                )
               ) : (
-                <p>No category data available.</p>
+                <p>
+                  No category data
+                  available.
+                </p>
               )}
 
             </div>
+
           </div>
+
         </section>
 
-        {/* =========================
-            RECENT COMPLAINTS
-        ========================= */}
+
+        {/* Recent complaints */}
+
         <section className="panel">
 
           <div className="panel-title">
 
-            <h2>Recent Complaints</h2>
+            <h2>
+              Recent Complaints
+            </h2>
 
             <button
               onClick={() => {
-                setFilter("All");
-                setPage("Complaints");
+                setFilter(
+                  "All"
+                );
+
+                setPage(
+                  "Complaints"
+                );
               }}
             >
               View All
@@ -333,142 +567,227 @@ export default function Dashboard({
 
           </div>
 
+
           <div className="recent-list">
 
-            {recentComplaints.length > 0 ? (
-              recentComplaints.map((complaint) => (
-                <button
-                  className="recent-item"
-                  key={complaint._id}
-                  onClick={() => {
-                    setSelected(complaint);
-                    setPage("Complaint Details");
-                  }}
-                >
-                  <span className="thumb">
-                    ▣
-                  </span>
+            {recentComplaints.length >
+            0 ? (
+              recentComplaints.map(
+                (complaint) => (
+                  <button
+                    className="recent-item"
+                    key={
+                      complaint._id
+                    }
+                    onClick={() => {
+                      setSelected(
+                        complaint
+                      );
 
-                  <span className="recent-text">
-                    <b>
-                      {complaint.title}
-                    </b>
+                      setPage(
+                        "Complaint Details"
+                      );
+                    }}
+                  >
 
-                    <small>
-                      {complaint.category}
-                    </small>
-                  </span>
+                    <span className="thumb">
+                      ▣
+                    </span>
 
-                  <StatusBadge
-                    status={complaint.status}
-                  />
-                </button>
-              ))
+
+                    <span className="recent-text">
+
+                      <b>
+                        {
+                          complaint.title
+                        }
+                      </b>
+
+                      <small>
+                        {
+                          complaint.category
+                        }
+                      </small>
+
+                    </span>
+
+
+                    <StatusBadge
+                      status={
+                        complaint.status
+                      }
+                    />
+
+                  </button>
+                )
+              )
             ) : (
-              <p>No complaints available.</p>
+              <p>
+                No complaints
+                available.
+              </p>
             )}
 
           </div>
+
         </section>
 
-        {/* =========================
-            CITY MAP
-        ========================= */}
+
+        {/* City map */}
+
         <section className="panel large">
 
           <div className="panel-title">
 
-            <h2>City Map</h2>
+            <h2>
+              City Map
+            </h2>
 
             <button
-              onClick={() => setPage("City Map")}
+              onClick={() =>
+                setPage(
+                  "City Map"
+                )
+              }
             >
               View Full Map
             </button>
 
           </div>
 
+
           <MapPreview
-            complaints={complaints}
+            complaints={
+              complaints
+            }
           />
 
         </section>
 
-        {/* =========================
-            COMPLAINT STATUS
-        ========================= */}
+
+        {/* Complaint status */}
+
         <section className="panel">
 
           <div className="panel-title">
-            <h2>Complaints Status</h2>
+
+            <h2>
+              Complaints Status
+            </h2>
+
           </div>
 
+
           <div
-            style={{ cursor: "pointer" }}
+            style={{
+              cursor:
+                "pointer",
+            }}
             onClick={() =>
-              handleCardClick("resolved")
+              handleCardClick(
+                "resolved"
+              )
             }
           >
             <Progress
               label="Resolved"
-              value={resolvedComplaints}
-              percent={resolvedPercent}
+              value={
+                resolvedComplaints
+              }
+              percent={
+                resolvedPercent
+              }
               cls="green-bar"
             />
           </div>
 
+
           <div
-            style={{ cursor: "pointer" }}
+            style={{
+              cursor:
+                "pointer",
+            }}
             onClick={() =>
-              handleCardClick("in-progress")
+              handleCardClick(
+                "in-progress"
+              )
             }
           >
             <Progress
               label="In Progress"
-              value={inProgressComplaints}
-              percent={inProgressPercent}
+              value={
+                inProgressComplaints
+              }
+              percent={
+                inProgressPercent
+              }
               cls="blue-bar"
             />
           </div>
 
+
           <div
-            style={{ cursor: "pointer" }}
+            style={{
+              cursor:
+                "pointer",
+            }}
             onClick={() =>
-              handleCardClick("pending")
+              handleCardClick(
+                "pending"
+              )
             }
           >
             <Progress
               label="Pending"
-              value={pendingComplaints}
-              percent={pendingPercent}
+              value={
+                pendingComplaints
+              }
+              percent={
+                pendingPercent
+              }
               cls="orange-bar"
             />
           </div>
 
+
           <div
-            style={{ cursor: "pointer" }}
+            style={{
+              cursor:
+                "pointer",
+            }}
             onClick={() =>
-              handleCardClick("assigned")
+              handleCardClick(
+                "assigned"
+              )
             }
           >
             <Progress
               label="Assigned"
-              value={assignedComplaints}
-              percent={assignedPercent}
+              value={
+                assignedComplaints
+              }
+              percent={
+                assignedPercent
+              }
               cls="purple-bar"
             />
           </div>
 
         </section>
 
-        {/* =========================
-            MY PROFILE
-        ========================= */}
+
+        {/* Profile */}
+
         <section className="panel profile-mini">
 
           <div className="panel-title">
-            <h2>My Profile</h2>
+
+            <h2>
+              My Profile
+            </h2>
+
           </div>
+
 
           <div className="profile-row">
 
@@ -476,40 +795,60 @@ export default function Dashboard({
               {user?.name
                 ? user.name
                     .split(" ")
-                    .map((word) => word[0])
+                    .map(
+                      (word) =>
+                        word[0]
+                    )
                     .join("")
                     .slice(0, 2)
                     .toUpperCase()
                 : "U"}
             </div>
 
+
             <div>
+
               <h3>
-                {user?.name || "User"}
+                {user?.name ||
+                  "User"}
               </h3>
 
               <p>
-                {user?.role || "Administrator"}
+                {user?.role ||
+                  "Administrator"}
               </p>
+
             </div>
 
           </div>
 
-          <p>
-            ✉ {user?.email || "Email not available"}
-          </p>
 
           <p>
-            ☎ {user?.phone || "Phone not available"}
+            ✉{" "}
+            {user?.email ||
+              "Email not available"}
           </p>
 
+
           <p>
-            ⌖ {user?.location || "Location not available"}
+            ☎{" "}
+            {user?.phone ||
+              "Phone not available"}
           </p>
+
+
+          <p>
+            ⌖{" "}
+            {user?.location ||
+              "Location not available"}
+          </p>
+
 
           <button
             className="full-btn"
-            onClick={() => setPage("Profile")}
+            onClick={() =>
+              setPage("Profile")
+            }
           >
             Edit Profile
           </button>

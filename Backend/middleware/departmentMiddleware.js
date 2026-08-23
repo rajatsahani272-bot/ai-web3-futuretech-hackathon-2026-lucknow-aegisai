@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-const adminMiddleware = (
+const departmentMiddleware = (
   req,
   res,
   next
@@ -13,23 +13,23 @@ const adminMiddleware = (
       return res.status(401).json({
         success: false,
         message:
-          "Authentication required",
+          "Department authentication required",
       });
     }
 
-    const decoded =
-      jwt.verify(
-        token,
-        process.env.ACCESS_TOKEN_SECRET
-      );
+    const decoded = jwt.verify(
+      token,
+      process.env.ACCESS_TOKEN_SECRET
+    );
 
     if (
-      decoded.role !== "admin"
+      decoded.role !==
+      "department"
     ) {
       return res.status(403).json({
         success: false,
         message:
-          "Admin access required",
+          "Department access required",
       });
     }
 
@@ -38,7 +38,7 @@ const adminMiddleware = (
     next();
   } catch (error) {
     console.error(
-      "Admin middleware error:",
+      "Department authentication error:",
       error.message
     );
 
@@ -50,4 +50,4 @@ const adminMiddleware = (
   }
 };
 
-export default adminMiddleware;
+export default departmentMiddleware;

@@ -20,7 +20,10 @@
         <a href="index.html">Home</a>
         <a href="report.html">Report Issue</a>
         <a href="complaints.html">My Complaints</a>
-        <a href="login.html" class="login-btn">Login</a>
+
+        <a href="login.html" class="login-btn" id="authBtn">
+            Login
+        </a>
     </div>
 
 </nav>
@@ -83,24 +86,24 @@
 
             <label>Location</label>
 
-            <div class="location-row">
+        <div class="location-row">
 
-                <input
-                    type="text"
-                    id="location"
-                    placeholder="Enter location"
-                    required
-                >
+    <input
+        type="text"
+        id="location"
+        placeholder="Enter location"
+        required
+    >
 
-                <button
-                    type="button"
-                    class="location-btn"
-                    onclick="getLocation()"
-                >
-                    📍 Get Location
-                </button>
+    <button
+        type="button"
+        class="location-btn"
+        onclick="getLocation()"
+    >
+        📍 Get Location
+    </button>
 
-            </div>
+</div>
 
             <button
                 class="primary-btn full-btn"

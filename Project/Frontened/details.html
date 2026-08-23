@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Complaint Details | FixMyCity</title>
+
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -24,13 +26,17 @@
 
 </nav>
 
+
 <div class="page-container">
+
 
     <div
         class="details-header"
         id="detailsHeader"
     >
+
         <div>
+
             <span
                 class="complaint-id"
                 id="complaintId"
@@ -38,14 +44,18 @@
                 Loading...
             </span>
 
+
             <h1 id="complaintTitle">
                 Loading...
             </h1>
 
+
             <p id="complaintLocation">
                 📍 Loading...
             </p>
+
         </div>
+
 
         <div
             class="status pending"
@@ -53,297 +63,625 @@
         >
             Loading...
         </div>
+
     </div>
+
+
 
     <div class="details-grid">
 
+
         <div class="details-card">
 
-            <h2>Complaint Information</h2>
+            <h2>
+                Complaint Information
+            </h2>
+
 
             <div class="detail-row">
-                <span>Category</span>
+
+                <span>
+                    Category
+                </span>
+
                 <strong id="complaintCategory">
                     Loading...
                 </strong>
+
             </div>
 
+
             <div class="detail-row">
-                <span>Severity</span>
+
+                <span>
+                    Severity
+                </span>
+
                 <strong
                     class="danger-text"
                     id="complaintSeverity"
                 >
-                    High
+                    Loading...
                 </strong>
+
             </div>
 
+
             <div class="detail-row">
-                <span>Department</span>
+
+                <span>
+                    Department
+                </span>
+
                 <strong id="complaintDepartment">
                     Loading...
                 </strong>
+
             </div>
 
+
             <div class="detail-row">
-                <span>Submitted</span>
+
+                <span>
+                    Submitted
+                </span>
+
                 <strong id="complaintDate">
                     Loading...
                 </strong>
+
             </div>
 
+
             <div class="detail-row">
-                <span>Description</span>
+
+                <span>
+                    Description
+                </span>
+
                 <strong id="complaintDescription">
                     Loading...
                 </strong>
+
             </div>
 
         </div>
 
+
+
         <div class="details-card">
 
-            <h2>🤖 AI Analysis</h2>
+            <h2>
+                🤖 AI Analysis
+            </h2>
+
 
             <p id="aiDescription">
                 AI analysis information will appear here.
             </p>
 
+
             <div class="ai-result">
-                <span>AI Confidence</span>
+
+                <span>
+                    AI Confidence
+                </span>
+
                 <strong id="aiConfidence">
                     94%
                 </strong>
+
             </div>
 
         </div>
 
     </div>
 
+
+
     <div class="details-card timeline-card">
 
-        <h2>📊 Complaint Timeline</h2>
+        <h2>
+            📊 Complaint Timeline
+        </h2>
+
 
         <div
             class="timeline"
             id="complaintTimeline"
         >
-            <p>Loading timeline...</p>
+
+            <p>
+                Loading timeline...
+            </p>
+
         </div>
 
     </div>
 
 </div>
 
+
+
 <script src="js/script.js"></script>
 
+
 <script>
-document.addEventListener("DOMContentLoaded", async function () {
 
-    const params = new URLSearchParams(
-        window.location.search
-    );
+document.addEventListener(
+    "DOMContentLoaded",
+    async function () {
 
-    const complaintId = params.get("id");
 
-    if (!complaintId) {
-        alert("Complaint ID not found.");
-        window.location.href = "complaints.html";
-        return;
-    }
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
 
-    const complaint =
-        await getComplaintById(complaintId);
 
-    if (!complaint) {
-        alert("Unable to load complaint.");
-        window.location.href = "complaints.html";
-        return;
-    }
+        const complaintId =
+            params.get("id");
 
-    document.getElementById("complaintId").innerText =
-        `Complaint #${complaint._id}`;
 
-    document.getElementById("complaintTitle").innerText =
-        complaint.title || "Untitled Complaint";
+        if (!complaintId) {
 
-    const latitude =
-        complaint.location?.latitude;
+            alert(
+                "Complaint ID not found."
+            );
 
-    const longitude =
-        complaint.location?.longitude;
+            window.location.href =
+                "complaints.html";
 
-    if (latitude && longitude) {
+            return;
+        }
+
+
+        const complaint =
+            await getComplaintById(
+                complaintId
+            );
+
+
+        if (!complaint) {
+
+            alert(
+                "Unable to load complaint."
+            );
+
+            window.location.href =
+                "complaints.html";
+
+            return;
+        }
+
+
+
+        document.getElementById(
+            "complaintId"
+        ).innerText =
+            `Complaint #${complaint._id}`;
+
+
+
+        document.getElementById(
+            "complaintTitle"
+        ).innerText =
+            complaint.title ||
+            "Untitled Complaint";
+
+
+
+        /*
+         * LOCATION
+         *
+         * Latitude / longitude are NOT
+         * displayed.
+         */
+
+     const latitude = complaint.location?.latitude;
+const longitude = complaint.location?.longitude;
+
+if (complaint.location?.address) {
+
+    document.getElementById(
+        "complaintLocation"
+    ).innerText =
+        `📍 ${complaint.location.address}`;
+
+} else if (latitude && longitude) {
+
+    try {
+
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1&accept-language=en`
+        );
+
+        const data = await response.json();
+
         document.getElementById(
             "complaintLocation"
         ).innerText =
-            `📍 ${latitude}, ${longitude}`;
-    } else {
+            `📍 ${data.display_name || "Location unavailable"}`;
+
+    } catch (error) {
+
+        console.error(
+            "Location fetch error:",
+            error
+        );
+
         document.getElementById(
             "complaintLocation"
         ).innerText =
             "📍 Location unavailable";
     }
 
-    const status =
-        complaint.status || "Pending";
-
-    const statusElement =
-        document.getElementById("complaintStatus");
-
-    statusElement.innerText = status;
-    statusElement.className =
-        `status ${status.toLowerCase().replace(/\s+/g, "-")}`;
+} else {
 
     document.getElementById(
-        "complaintCategory"
+        "complaintLocation"
     ).innerText =
-        complaint.category || "Other";
+        "📍 Location unavailable";
+}
 
-    document.getElementById(
-        "complaintDescription"
-    ).innerText =
-        complaint.description || "No description";
 
-    document.getElementById(
-        "complaintDepartment"
-    ).innerText =
-        complaint.assignedDepartment?.name ||
-        "Not assigned";
 
-    document.getElementById(
-        "complaintDate"
-    ).innerText =
-        complaint.createdAt
-            ? new Date(
-                complaint.createdAt
-            ).toLocaleDateString(
-                "en-IN",
-                {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric"
-                }
-            )
-            : "Date unavailable";
+        const status =
+            complaint.status ||
+            "pending";
 
-    document.getElementById(
-        "aiDescription"
-    ).innerText =
-        `AI identified this complaint as a ${complaint.category || "civic"} issue.`;
 
-    renderComplaintTimeline(complaint);
-});
+        const statusElement =
+            document.getElementById(
+                "complaintStatus"
+            );
 
-function renderComplaintTimeline(complaint) {
+
+        statusElement.innerText =
+            status;
+
+
+        statusElement.className =
+            `status ${status
+                .toLowerCase()
+                .replace(/\s+/g, "-")}`;
+
+
+
+        document.getElementById(
+            "complaintCategory"
+        ).innerText =
+            complaint.category ||
+            "Other";
+
+
+
+        document.getElementById(
+            "complaintSeverity"
+        ).innerText =
+            complaint.priority ||
+            complaint.severity ||
+            "Medium";
+
+
+
+        document.getElementById(
+            "complaintDepartment"
+        ).innerText =
+            complaint.department?.name ||
+            "Not assigned";
+
+
+
+        document.getElementById(
+            "complaintDescription"
+        ).innerText =
+            complaint.description ||
+            "No description";
+
+
+
+        document.getElementById(
+            "complaintDate"
+        ).innerText =
+            complaint.createdAt
+                ? new Date(
+                    complaint.createdAt
+                ).toLocaleDateString(
+                    "en-IN",
+                    {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric"
+                    }
+                )
+                : "Date unavailable";
+
+
+
+        document.getElementById(
+            "aiDescription"
+        ).innerText =
+            `AI identified this complaint as a ${
+                complaint.category ||
+                "civic"
+            } issue.`;
+
+
+
+        renderComplaintTimeline(
+            complaint
+        );
+
+    }
+);
+
+
+
+
+function renderComplaintTimeline(
+    complaint
+) {
 
     const timeline =
         document.getElementById(
             "complaintTimeline"
         );
 
-    const status =
-        (complaint.status || "Pending")
-        .toLowerCase();
 
-    const submittedDate =
-        complaint.createdAt
-            ? new Date(
-                complaint.createdAt
-            ).toLocaleString(
-                "en-IN",
-                {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit"
-                }
-            )
-            : "Date unavailable";
+    const history =
+        complaint.statusHistory || [];
 
-    let assignedClass = "";
-    let progressClass = "";
-    let resolvedClass = "";
 
-    if (
-        status === "assigned" ||
-        status === "in progress" ||
-        status === "resolved"
-    ) {
-        assignedClass = "completed";
-    }
+    const getHistory = (
+        status
+    ) => {
 
-    if (
-        status === "in progress" ||
-        status === "resolved"
-    ) {
-        progressClass = "completed";
-    }
+        return history.find(
+            (item) =>
+                item.status === status
+        );
 
-    if (status === "resolved") {
-        resolvedClass = "completed";
-    }
+    };
+
+
+    const formatDate = (
+        date
+    ) => {
+
+        if (!date) {
+            return "Waiting";
+        }
+
+
+        return new Date(
+            date
+        ).toLocaleString(
+            "en-IN",
+            {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                hour: "numeric",
+                minute: "2-digit"
+            }
+        );
+
+    };
+
+
+    const pending =
+        getHistory("pending");
+
+
+    const assigned =
+        getHistory("assigned");
+
+
+    const inProgress =
+        getHistory("in-progress");
+
+
+    const resolved =
+        getHistory("resolved");
+
 
     timeline.innerHTML = `
+
+
         <div class="timeline-item completed">
-            <div class="timeline-dot">✓</div>
-            <div>
-                <h3>Complaint Submitted</h3>
-                <p>${submittedDate}</p>
-            </div>
-        </div>
 
-        <div class="timeline-item ${assignedClass}">
             <div class="timeline-dot">
-                ${assignedClass ? "✓" : "○"}
+                ✓
             </div>
+
+
             <div>
-                <h3>Assigned to Department</h3>
+
+                <h3>
+                    Complaint Submitted
+                </h3>
+
+
                 <p>
-                    ${
-                        complaint.assignedDepartment?.name ||
-                        "Waiting for assignment"
-                    }
+                    ${formatDate(
+                        pending?.timestamp ||
+                        complaint.createdAt
+                    )}
                 </p>
+
             </div>
+
         </div>
 
-        <div class="timeline-item ${progressClass}">
+
+
+        <div class="timeline-item ${
+            assigned
+                ? "completed"
+                : ""
+        }">
+
             <div class="timeline-dot">
-                ${progressClass ? "✓" : "○"}
+
+                ${
+                    assigned
+                        ? "✓"
+                        : "○"
+                }
+
             </div>
+
+
             <div>
-                <h3>Work in Progress</h3>
+
+                <h3>
+                    Assigned to Department
+                </h3>
+
+
                 <p>
+
                     ${
-                        status === "in progress" ||
-                        status === "resolved"
-                            ? "Complaint is being worked on"
+                        assigned
+                            ? `${
+                                complaint
+                                    .department
+                                    ?.name ||
+                                "Department assigned"
+                              } • ${
+                                formatDate(
+                                    assigned.timestamp
+                                )
+                              }`
+                            : "Waiting for assignment"
+                    }
+
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="timeline-item ${
+            inProgress
+                ? "completed"
+                : ""
+        }">
+
+            <div class="timeline-dot">
+
+                ${
+                    inProgress
+                        ? "✓"
+                        : "○"
+                }
+
+            </div>
+
+
+            <div>
+
+                <h3>
+                    Work in Progress
+                </h3>
+
+
+                <p>
+
+                    ${
+                        inProgress
+                            ? `Started • ${
+                                formatDate(
+                                    inProgress.timestamp
+                                )
+                              }`
                             : "Waiting for department"
                     }
+
                 </p>
+
+
+                ${
+                    inProgress?.note
+                        ? `
+                            <p>
+                                Note:
+                                ${inProgress.note}
+                            </p>
+                          `
+                        : ""
+                }
+
             </div>
+
         </div>
 
-        <div class="timeline-item ${resolvedClass}">
+
+
+        <div class="timeline-item ${
+            resolved
+                ? "completed"
+                : ""
+        }">
+
             <div class="timeline-dot">
-                ${resolvedClass ? "✓" : "○"}
+
+                ${
+                    resolved
+                        ? "✓"
+                        : "○"
+                }
+
             </div>
+
+
             <div>
-                <h3>Resolved</h3>
+
+                <h3>
+                    Resolved
+                </h3>
+
+
                 <p>
+
                     ${
-                        status === "resolved"
-                            ? "Complaint resolved"
+                        resolved
+                            ? `Resolved • ${
+                                formatDate(
+                                    resolved.timestamp
+                                )
+                              }`
                             : "Waiting for completion"
                     }
+
                 </p>
+
+
+                ${
+                    resolved?.note
+                        ? `
+                            <p>
+                                Note:
+                                ${resolved.note}
+                            </p>
+                          `
+                        : ""
+                }
+
             </div>
+
         </div>
+
     `;
+
 }
+
 </script>
 
+
 </body>
+
 </html>
