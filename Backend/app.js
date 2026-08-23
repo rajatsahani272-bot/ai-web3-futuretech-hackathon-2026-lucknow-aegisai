@@ -20,9 +20,13 @@ const allowedOrigins = [
     "http://localhost:5173",
     "http://127.0.0.1:5500",
     "http://localhost:5500",
-    "https://ai-web3-futuretech-hackathon-2026-l.vercel.app"
-];
 
+    // Admin Dashboard
+    "https://ai-web3-futuretech-hackathon-2026-l.vercel.app",
+
+    // User Frontend
+    "https://ai-web3-futuretech-hackathon-2026-lucknow-aegisai-d7tyv9k3x.vercel.app"
+];
 app.use(
     cors({
         origin: function (origin, callback) {
